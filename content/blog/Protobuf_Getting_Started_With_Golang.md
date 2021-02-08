@@ -100,3 +100,63 @@ id:1001  email:"abc@xyz.in"  is_active:true
 {{< / highlight >}}
 
 You can checkout code for this example here on [github](https://github.com/sri-shubham/blogcode/tree/master/Getting_Started_In_Protobuf_With_Go)
+
+## Moment of Truth
+
+Lets compare the difference in message size that we have been talking about. We will compare same data stored in JSON and protobuf serialized message.
+
+We added a new message to protobuf file and compiled it.
+
+{{< highlight proto "linenos=table" >}}
+// Person : Schema describing a person
+message PersonList {
+  repeated Person persons = 1;
+}
+{{< / highlight >}}
+
+Now we will take this new message publish data and serialize to see the difference in size.
+
+{{< highlight go "linenos=table" >}}
+func main() {
+	var list pb.PersonList
+
+	list.Persons = append(list.Persons, &pb.Person{
+		Id:       1001,
+		Email:    "JonDoe@xyz.com",
+		IsActive: false,
+	})
+
+	list.Persons = append(list.Persons, &pb.Person{
+		Id:       1002,
+		Email:    "Ronald@xyz.com",
+		IsActive: false,
+	})
+
+	list.Persons = append(list.Persons, &pb.Person{
+		Id:       1003,
+		Email:    "Harold@xyz.com",
+		IsActive: false,
+	})
+
+	pbout, err := proto.Marshal(&list)
+	if err != nil {
+		panic(err)
+	}
+
+	jsonOut, err := json.Marshal(list)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("length of protoOut", len(pbout))
+	fmt.Println("length of jsonOut", len(jsonOut))
+}
+{{< / highlight >}}
+
+Finally lets run the program and check. Almost 3 times smaller message size.
+
+{{< highlight bash "linenos=table" >}}
+➜  example2 git:(master) ✗ go run main.go
+length of protoOut 63
+length of jsonOut 124
+{{< / highlight >}}
