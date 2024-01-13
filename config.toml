@@ -2,10 +2,10 @@
 baseURL = "https://sri-shubham.github.io"
 
 # The name of this wonderful theme ;-).
-theme = 'hugo-bearblog'
+theme = 'hugo-PaperMod'
 
 # Basic metadata configuration for your blog.
-title = "Shubham Srivastava Blog"
+title = "Shubham Srivastava"
 author = "Shubham Srivastava"
 copyright = "Copyright © 2020, Shubham Srivastava."
 languageCode = "en-US"
@@ -22,23 +22,40 @@ ignoreErrors = ["error-disable-taxonomy"]
 
 [params]
   # The "description" of your website. This is used in the meta data of your generated html.
-  description = "Hugo + Bear = :heart:"
+  description = "Hello World! 👋 I'm Shubham, a passionate coder who loves building tech wonders. With a knack for Golang and a flair for microservices, I'm on a journey to reshape the digital landscape."
 
   # The path to your "favicon". This should be a square (at least 32px x 32px) png-file.
   # Hint: It's good practise to also put a "favicon.ico"-file into your "static"-folder.
-  favicon = "images/favicon.png"
+  favicon = "favicon.ico"
 
   # These "images" are used for the structured data templates. This will show up, when
   # services like Twitter or Slack want to generate a preview of a link to your site.
   # See https://gohugo.io/templates/internal#twitter-cards and
   # https://gohugo.io/templates/internal#open-graph.
-  images = ["images/share.png"]
+  images = ["images/home.png"]
 
   # Another "title" :-). This one is used as the site_name on the Hugo's internal
   # opengraph structured data template.
-  # See https://ogp.me/ and https://gohugo.io/templates/internal#open-graph.
   title = "Shubham Srivastava"
 
-  # This theme will, by default, inject a made-with-line at the bottom of the page.
-  # You can turn it off, but we would really appreciate if you don’t :-).
-  hideMadeWithLine = true
+
+[[menu.main]]
+identifier = "blog"
+name = "blog"
+url = "/blog/"
+weight = 10
+
+[[menu.main]]
+identifier = "about"
+name = "about"
+url = "/about/"
+weight = 20
+
+[[menu.main]]
+identifier = "cv"
+name = "cv"
+url = "/cv/"
+weight = 30
+
+[markup.goldmark.renderer]
+  unsafe = true
