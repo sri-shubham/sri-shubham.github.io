@@ -1,7 +1,7 @@
 # Shubham Srivastava
 
 <a href="https://www.linkedin.com/in/sri-shubham" target="_blank">
-  <img src="/images/linkedin-48.png" alt="LinkedIn">
+  <img src="/images/linkedin-48.png" alt="LinkedIn" width="36px">
 </a>
 
 Results-driven Software Development Engineer specializing in Golang with a strong focus on microservice architecture. Proven track record in successfully migrating monolithic systems to microservices, bringing a creative approach and commitment to error-free development to dynamic tech environments.
