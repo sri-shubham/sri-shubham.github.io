@@ -4,10 +4,26 @@
         <div class="row">
             <div class="col-md-12">
                 <p class="text-center">
-                    Support my work: <a href="https://www.buymeacoffee.com/srishubham" target="_blank">Buy Me a Coffee ☕
-                    </a>
+                    Connect with me:
+                    <a href="https://www.linkedin.com/in/sri-shubham" target="_blank">LinkedIn</a>
+                    &nbsp;|&nbsp;
+                    <a href="https://github.com/sri-shubham" target="_blank">GitHub</a>
+                    &nbsp;|&nbsp;
+                    Support my work:
+                    <a href="https://www.buymeacoffee.com/srishubham" target="_blank">Buy Me a Coffee ☕</a>
                 </p>
             </div>
         </div>
     </div>
+
+    {{- if site.Copyright }}
+    <span>{{ site.Copyright | markdownify }}</span>
+    {{- else }}
+    <span>&copy; {{ now.Year }} <a href="{{ "" | absLangURL }}">{{ site.Title }}</a></span>
+    {{- end }} |
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
 </footer>

@@ -7,8 +7,9 @@ theme = 'hugo-PaperMod'
 # Basic metadata configuration for your blog.
 title = "Shubham Srivastava"
 author = "Shubham Srivastava"
-copyright = "Copyright © 2020, Shubham Srivastava."
+copyright = "Copyright © 2024, Shubham Srivastava."
 languageCode = "en-US"
+paginate     = 10
 
 # Generate a nice robots.txt for SEO
 enableRobotsTXT = true
@@ -16,8 +17,8 @@ enableRobotsTXT = true
 # Generate "Bearblog"-like URLs !only!, see https://bearblog.dev/.
 disableKinds = ["taxonomy"]
 ignoreErrors = ["error-disable-taxonomy"]
+
 [permalinks]
-  blog = "/:slug/"
   tags = "/:slug"
 
 [params]
@@ -38,27 +39,42 @@ ignoreErrors = ["error-disable-taxonomy"]
   # opengraph structured data template.
   title = "Shubham Srivastava"
 
+  hideFooter=true
+
+  disableSpecial1stPost=true
+
+[params.homeInfoParams]
+  Title = "Hello, World! ✨"
+  Content = "Step into the enchanting realm where code dances with creativity! 👨‍💻✨ I'm Shubham, your tech maestro on this digital odyssey. Explore the wonders of Golang, unravel the magic of microservices, and immerse yourself in all things geeky. Together, let's transform aspirations into digital masterpieces – are you prepared for a tech-tastic journey? 🌐🚀"
+
+[[params.socialIcons]]
+  name = "Github"
+  url = "https://github.com/sri-shubham"
+
+[[params.socialIcons]]
+  name = "LinkedIn"
+  url = "https://www.linkedin.com/in/sri-shubham"
 
 [[menu.main]]
-identifier = "blog"
+identifier = "Blog"
 name = "blog"
 url = "/blog/"
 weight = 10
 
 [[menu.main]]
-identifier = "projects"
+identifier = "Projects"
 name = "projects"
 url = "/projects/"
 weight = 20
 
 [[menu.main]]
-identifier = "about"
+identifier = "About"
 name = "about"
 url = "/about/"
 weight = 30
 
 [[menu.main]]
-identifier = "cv"
+identifier = "CV"
 name = "cv"
 url = "/cv/"
 weight = 40

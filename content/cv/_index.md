@@ -1,5 +1,5 @@
 +++
-title = "Shubham Srivastava ✨"
+title = "Software Wizard ✨"
 date = "2024-01-13T10:45:43+05:30"
 draft = false
 +++
@@ -18,7 +18,7 @@ Results-driven Software Development Engineer specializing in Golang with a stron
 ## EXPERIENCE
 
 ### Sr Backend Developer | Nov 2022 - Present
-**Kalido(GrowThrive Pvt. Ltd.)**, Gurugram  
+**Kalido(GrowThrive Pvt. Ltd.)**       
 *Golang, Postgres, Redis, Envoy, RabbitMQ, ElasticSearch*
 
 - Spearheaded the migration of critical components to microservices, optimizing scalability and system modularity.
@@ -28,7 +28,7 @@ Results-driven Software Development Engineer specializing in Golang with a stron
 - Utilized ElasticSearch for advanced search and analytics.
 
 ### Sr Software Developer | Feb 2021 - Oct 2022
-**TFT Pvt. Ltd.**, Gurugram  
+**TFT Pvt. Ltd.**   
 *Golang, Postgres, Redis, Envoy, RabbitMQ*
 
 - Led the development of communication-centric gRPC services, improving overall system efficiency.
@@ -36,15 +36,15 @@ Results-driven Software Development Engineer specializing in Golang with a stron
 - Worked with PHP and Sails.js for specific project requirements.
 
 ### Software Engineer | Jan 2020 - Jan 2021
-**P.C. Financial Services Pvt. Ltd.**, Gurugram  
-*Golang, MySQL*
+**P.C. Financial Services Pvt. Ltd.**  
+*Golang, MySQL, Redis, WebRTC*
 
 - Contributed to the integration of external APIs for payment services.
 - Designed and implemented a customer KYC module.
 - Wrote comprehensive unit tests for robust code quality.
 
 ### Software Engineer | Feb 2018 - Dec 2019
-**Tolexo Online Pvt. Ltd.**, Gurugram  
+**Tolexo Online Pvt. Ltd.**
 *Golang, PHP, Node.js, Postgres, ElasticSearch*
 
 - Successfully executed the migration of monolithic modules into efficient Go microservices.

@@ -4,6 +4,7 @@ date= "2021-02-07T19:45:43+05:30"
 description = "Embark on a fun learning journey with gRPC in Go - A basic tutorial for beginners."
 tags = ["Go", "Protobuf", "Protocol Buffer", "gRPC"]
 draft= false
+image="/images/home.png"
 +++
 
 Hey there, tech enthusiast! 🚀 Ready to explore the world of gRPC with Go? Buckle up for a joyous ride as we create our very own RPC service, multiply some numbers, and have a blast with code.
