@@ -4,15 +4,6 @@ date = "2024-01-13T10:45:43+05:30"
 draft = false
 +++
 
-<div style="display: flex;">
-  <a href="https://www.linkedin.com/in/sri-shubham" target="_blank" style="text-decoration: none;">
-    <img src="/images/linkedin-48.png" alt="LinkedIn" width="36px" style="margin-right: 10px;">
-  </a>
-  <a href="https://github.com/sri-shubham" target="_blank" style="text-decoration: none;">
-    <img src="/images/github-30.png" alt="GitHub" width="36px">
-  </a>
-</div>
-
 Results-driven Software Development Engineer specializing in Golang with a strong focus on microservice architecture. Proven track record in successfully migrating monolithic systems to microservices, bringing a creative approach and commitment to error-free development to dynamic tech environments.
 
 ## EXPERIENCE
