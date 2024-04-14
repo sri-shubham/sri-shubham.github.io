@@ -29,62 +29,62 @@ So to run a secure cluster we need certificates for each of the cockroachDB node
 ### Lets create a CA who will sign our certificates
 
 Start by creating a directory where our certificates will be stored
-` bash
+```bash
     mkdir -p certs/ca
-`
+```
 
 Use OpenSSL to generate CA Key and certificate
-`bash
+```bash
     openssl genrsa -out certs/ca/ca.key 2048
     openssl req -x509 -nodes -days 365 -key certs/ca/ca.key -out certs/ca/ca.crt -subj '/CN=LocalCA/O=CA/C=IN'
-`
+```
 
 now if we check folder contents we should have CA private key and certificate
-`bash
+```bash
 root@localhost:~# ls -l certs/ca
 total 8
 -rw-r--r-- 1 root root 1180 Apr 14 08:43 ca.crt
 -rw------- 1 root root 1704 Apr 14 08:43 ca.key
-`
+```
 
 ### Now we will add certificates for each of our nodes
 
 First things first we will create private key for each of the node.
 
-`bash
+```bash
     mkdir -p certs/node1 certs/node2 certs/node3
 
     openssl genrsa -out certs/node1/node.key 2048
     openssl genrsa -out certs/node2/node.key 2048
     openssl genrsa -out certs/node3/node.key 2048
-`
+```
 
 Now we will create Certificate Signing Request(CSR) for each of the nodes
 
-`bash
+```bash
     openssl req -new -key certs/node1/node.key -out certs/node1/node.csr  -subj '/CN=node/O=LocalCockroachNode1/C=IN'
     openssl req -new -key certs/node2/node.key -out certs/node2/node.csr  -subj '/CN=node/O=LocalCockroachNode2/C=IN'
     openssl req -new -key certs/node3/node.key -out certs/node3/node.csr  -subj '/CN=node/O=LocalCockroachNode3/C=IN'
-`
+```
 
 Another thing these certificates will need is IP and name of each node where it will be deployed. We will be using static IP in docker-compose in our own network.
 
 Now we will use CA key to sign the CSR
 
-`bash
+```bash
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.11,DNS:roach1"
 openssl x509 -req -in ./certs/node1/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node1/node.crt -days 365000 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.12,DNS:roach2"
 openssl x509 -req -in ./certs/node2/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node2/node.crt -days 365000 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.13,DNS:roach3"
 openssl x509 -req -in ./certs/node3/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node3/node.crt -days 365000 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
-`
+```
 
 ### Setting up for docker deployment
 
 #### The docker-compose file
 
-```bash
+```yaml
 version: '3'
 
 services:
@@ -161,28 +161,30 @@ volumes:
 
 #### We now copy ca certificate to each node
 
+```bash
 cp certs/ca/ca.crt certs/node1
 cp certs/ca/ca.crt certs/node2
 cp certs/ca/ca.crt certs/node3
+```
 
 ### Now the magic
 
-`
+```bash
 root@localhost:~# docker ps
 CONTAINER ID   IMAGE                           COMMAND                  CREATED              STATUS          PORTS                                                                                                 NAMES
 8addcde683ff   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…"   About a minute ago   Up 30 seconds   26257/tcp, 0.0.0.0:26259->26259/tcp, :::26259->26259/tcp, 0.0.0.0:9093->8080/tcp, :::9093->8080/tcp   roach3
 8489539a425d   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…"   About a minute ago   Up 29 seconds   0.0.0.0:26257->26257/tcp, :::26257->26257/tcp, 0.0.0.0:9091->8080/tcp, :::9091->8080/tcp              roach1
 952ef99922fb   cockroachdb/cockroach:v23.2.4   "/cockroach/cockroac…"   About a minute ago   Up 30 seconds   26257/tcp, 0.0.0.0:26258->26258/tcp, :::26258->26258/tcp, 0.0.0.0:9092->8080/tcp, :::9092->8080/tcp   roach2
-`
+```
 
 Our servies are now running just need to initialise the cluster.
 
 ### Generate cockroach client certificates and initialise the cluser
 
-`bash
+```bash
 docker exec roach1 ./cockroach cert create-client root --certs-dir=/cockroach/cockroach-certs --ca-key=/cockroach/ca/ca.key --lifetime=24h
 docker exec roach1 ./cockroach --host=roach1:26357 --certs-dir=/cockroach/cockroach-certs init
-`
+```
 
 ## Voilà! It's Done
 
