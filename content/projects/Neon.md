@@ -4,6 +4,7 @@ date = "2024-01-13T10:45:43+05:30"
 description = "A sleek Rest framework that effortlessly lights up your API development, using struct tags for that extra bit of handler magic."
 tags = ["Go", "REST", "API", "Framework", "side project"]
 draft = false
+author = "Shubham Srivastava"
 +++
 
 Repo: [Neon on GitHub](https://github.com/sri-shubham/neon)

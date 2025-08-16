@@ -1,9 +1,8 @@
 +++
 title = "Embark on a Protobuf Adventure with Go"
 date = "2021-02-06T16:53:17+05:30"
-
+author = "Shubham Srivastava"
 description = "Unraveling the mysteries of protocol buffers and diving into the world of Go - Let the fun begin!"
-
 tags = ["Go", "Protobuf", "Protocol Buffer"]
 draft = false
 +++

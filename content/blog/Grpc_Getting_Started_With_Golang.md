@@ -5,163 +5,107 @@ description = "Embark on a fun learning journey with gRPC in Go - A basic tutori
 tags = ["Go", "Protobuf", "Protocol Buffer", "gRPC"]
 draft= false
 image="/images/home.png"
+author = "Shubham Srivastava"
 +++
+go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+go run server.go
+go run server.go
+go run client.go
 
-Hey there, tech enthusiast! 🚀 Ready to explore the world of gRPC with Go? Buckle up for a joyous ride as we create our very own RPC service, multiply some numbers, and have a blast with code.
+Hey — let's make this quick and practical. This post walks through building a tiny gRPC service in Go (a simple multiplier), keeping the steps copy/paste-friendly.
+
+## TL;DR
+
+- Define a proto with a service and messages
+- Generate Go code with protoc plugins
+- Implement the server, run it, and call it from a client
 
 ## Prerequisites
 
-Assuming you've got the basics of [protocol buffers](/getting-started-in-protobuf-with-go/) down pat and you're curious about [gRPC](). If not, no worries! It's a fantastic opportunity to learn something new.
+- Go toolchain
+- protoc compiler
+- protoc Go plugins (see commands below)
 
-Grab the example code from our [GitHub repository](https://github.com/sri-shubham/blogcode/tree/master/Getting_Started_In_gRPC_WithGo/example1) and head to the `Getting_Started_In_gRPC_WithGo/example1` directory.
+Grab the example code from the repo if you want to follow along.
 
-If you're missing the `protoc` compiler, fear not! Learn how to install it [here](http://google.github.io/proto-lens/installing-protoc.html).
-
-Now, let's get those Go code generator plugins rolling:
+### Install code generator plugins
 
 ```bash
 go get -u github.com/golang/protobuf/protoc-gen-go
 go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 ```
 
-## Let the Fun Begin - Creating Our Very First Service!
+### Define a tiny service
 
-We're keeping it simple - a service that multiplies two numbers.
+In your .proto file define a service and the messages. Example:
 
-1. **Defining our first service**
-
-   In our proto file, we'll use this syntax:
-
-   ```proto
-   service Calculator {
-       // ...
-   }
-   ```
-
-   Let's call it `Calculator`.
-
-2. **Time to add methods to the service**
-
-   Each RPC method in a service is defined like this:
-
-   ```proto
+```proto
+service Calculator {
    rpc Multiply(TwoNumbers) returns (Number) {}
-   ```
+}
 
-   Our service now looks like this:
+message TwoNumbers {
+   int64 num1 = 1;
+   int64 num2 = 2;
+}
 
-   ```proto
-   service calculator {
-       rpc Multiply(TwoNumbers) returns (Number) {}
-   }
-   ```
+message Number {
+   int64 num = 1;
+}
+```
 
-3. **Defining Our Messages**
-
-   ```proto
-   message TwoNumbers {
-       int64 num1 = 1;
-       int64 num2 = 2;
-   }
-
-   message Number {
-       int64 num = 1;
-   }
-   ```
-
-With our interface ready, let's compile the proto file:
+Compile the proto into Go code (adjust flags to your setup):
 
 ```bash
 protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative pb/*.proto
 ```
 
-## Creating the Server
+### Implement the server
 
-The protoc has worked its magic, and now it's time to implement our gRPC server. Two steps, and we're good to go:
+Create a Go type implementing the generated interface and register it with a gRPC server:
 
-## Creating the Server
+```go
+// Calculator : Implements Calculator Service
+type Calculator struct{}
 
-The protoc has worked its magic, and now it's time to implement our gRPC server. Two steps, and we're good to go:
+// Multiply Implementation of Multiply interface
+func (c *Calculator) Multiply(ctx context.Context, in *pb.TwoNumbers) (*pb.Number, error) {
+   return &pb.Number{Num: in.Num1 * in.Num2}, nil
+}
 
-1. **Implementing Service Interface**
+// Register and start
+lis, err := net.Listen("tcp", ":8081")
+if err != nil {
+   log.Fatalf("failed to listen: %v", err)
+}
 
-   Check out the `server/calculator.go` file for the nitty-gritty details. We're creating a type and implementing all the interface methods.
+grpcServer := grpc.NewServer()
+pb.RegisterCalculatorServer(grpcServer, &server.Calculator{})
+log.Fatal(grpcServer.Serve(lis))
+```
 
-   ```go
-   // Calculator : Implements Calculator Service
-   type Calculator struct{}
-
-   // Multiply Implementation of Multiply interface
-   func (c *Calculator) Multiply(ctx context.Context, in *pb.TwoNumbers) (*pb.Number, error) {
-       return &pb.Number{Num: in.Num1 * in.Num2}, nil
-   }
-   ```
-
-2. **Registering Our Service And Starting Server**
-
-   Create a listener, set up the server, and let it rip! All neatly done in `server.go`.
-
-   ```go
-   lis, err := net.Listen("tcp", ":8081")
-   if err != nil {
-       log.Fatalf("failed to listen: %v", err)
-   }
-
-   // Create a new gRPC Server
-   grpcServer := grpc.NewServer()
-
-   // Register our Calculator service
-   pb.RegisterCalculatorServer(grpcServer, &server.Calculator{})
-
-   // Start the server
-   log.Fatal(grpcServer.Serve(lis))
-   ```
-
-With the server implemented, let's run it:
+Run the server:
 
 ```bash
-# Start the server
 go run server.go
 ```
 
-Now, your server is up and running, ready to perform some mathematical magic! 🚀
+### Implement the client
 
-## Creating the Client
+Dial the server and call the RPC:
 
-For the client, all we need to do is dial a connection to the server and call the methods. Easy peasy:
-
-1. **Create a connection to the server**
-
-   ```go
-   conn, err := grpc.Dial(":8081", grpc.WithInsecure())
-   ```
-
-2. **Create A New Client**
-
-   ```go
-   client := pb.NewCalculatorClient(conn)
-   ```
-
-3. **Call the service Method**
-
-   ```go
-   val, err := client.Multiply(context.Background(), &pb.TwoNumbers{Num1: 3, Num2: 4})
-   ```
-
-Ready to run and see if everything is working? Fire up the server, start the client, and let the magic happen!
-
-```bash
-# Start the server
-go run server.go
+```go
+conn, err := grpc.Dial(":8081", grpc.WithInsecure())
+client := pb.NewCalculatorClient(conn)
+val, err := client.Multiply(context.Background(), &pb.TwoNumbers{Num1: 3, Num2: 4})
 ```
 
+Run the client:
+
 ```bash
-# Run the client
 go run client.go
 ```
 
-If you see the server starting message and get a result like `num:12`, congratulations! 🎉 Your gRPC adventure in Go is off to a fantastic start.
+If you see a response like `num:12`, you are done. If not, confirm the server is listening on the expected port and that the generated pb files are in place.
 
-In case you encounter a hiccup, double-check that your server is running, and the client is connecting to the correct address.
-
-Happy coding, and may your gRPC journey be full of joy and learning! 🚀
+That's it — small, practical, and easy to extend when you add streaming or auth.
