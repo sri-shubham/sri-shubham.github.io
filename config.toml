@@ -22,6 +22,7 @@ ignoreErrors = ["error-disable-taxonomy"]
   tags = "/:slug"
 
 [params]
+  mainSections = ["blog", "projects"]
   # The "description" of your website. This is used in the meta data of your generated html.
   description = "Hello World! 👋 I'm Shubham, a passionate coder who loves building tech wonders. With a knack for Golang and a flair for microservices, I'm on a journey to reshape the digital landscape."
 

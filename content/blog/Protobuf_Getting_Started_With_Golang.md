@@ -7,42 +7,29 @@ tags = ["Go", "Protobuf", "Protocol Buffer"]
 draft = false
 +++
 
-Greetings, fellow code explorers! 🚀 Ready to decode the secrets of protocol buffers and kickstart your journey with Go? Join me on this adventure where we'll demystify the wonders of Protobuf, compare it to other alternatives, and even create our own schemas! 🕵️‍♂️✨
+Protocol Buffers (or Protobuf) are one of those technologies that I've come to appreciate more and more over time. At first glance, they can seem a bit more complex than good old JSON, but once you get the hang of them, they offer a powerful way to structure and serialize data. This post is a quick, hands-on guide to getting started with Protobuf in Go, based on my own experience.
 
-## What are Protocol Buffers?
+## The "Why" Behind Protobuf
 
-"Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data." - [Google Developers](https://developers.google.com)
+For me, the appeal of Protobuf comes down to a few key things:
+-   **A Clear Schema**: Defining your data structure in a `.proto` file forces you to be explicit about your data model. This has saved me from countless bugs that might have slipped through with a more flexible format like JSON.
+-   **Performance**: The binary format is compact and fast to parse, which can make a real difference in high-throughput systems.
+-   **Interoperability**: `protoc`, the Protobuf compiler, can generate code for many different languages, making it easier to build systems with multiple components written in different tech stacks.
 
-Think of Protobuf as a superhero for your data - compact, lightning-fast, and ready for action. It uses binary serialization, making messages smaller and zippier compared to the verbose XML or JSON. How? Through a special `.proto` file defining the data schema. Let's unravel this magic!
+## A Practical Example
 
-## Benefits
+Let's walk through a simple example: defining a `Person` message, generating the Go code, and then using it to serialize and deserialize data.
 
-1. **Smaller and faster**
-   
-   Protobuf swoops in with binary serialization, resulting in smaller messages that zip through the wire faster than a superhero in action. Perfect for microservices handling millions of requests daily - every optimization counts!
+### 1. Define the Schema
 
-2. **Backward and forward compatibility**
-   
-   Numbered fields in protobuf schemas keep your code future-proof. Newer changes to the schema play nice with older code, ensuring compatibility and peace in the coding kingdom.
-
-3. **Interoperability**
-   
-   Protobuf brings its own custom proto file compiler, generating code for various languages. No more language barriers - serialize and deserialize messages seamlessly across the coding landscape.
-
-4. **Clear cross-application scheme**
-   
-   Protobuf enforces a strict schema, bringing order to the chaos. Your data format stays consistent across the system, especially handy when your system dances with multiple applications sharing the same schemas.
-
-## Let's Create Our First Schema
-
-Enough chit-chat, let's get our hands dirty! Say hello to our first proto file, named `pb/person.proto`.
+First, I created a file named `person.proto` to define the structure of my `Person` message.
 
 ```proto
 syntax = "proto3";
 
-package main;
+option go_package = "./pb";
 
-option go_package = "main";
+package pb;
 
 message Person {
   uint64 id = 1;
@@ -51,128 +38,79 @@ message Person {
 }
 ```
 
-Hold on to your hats! We've defined our first message. Now, let's unleash the protoc compiler:
+This is a simple message with three fields, each with a type and a unique number.
+
+### 2. Generate the Go Code
+
+Next, I used the `protoc` compiler to generate the Go code from my `.proto` file.
 
 ```bash
-protoc --proto_path=pb/. --go_out=pb/. person.proto
+# Make sure you have the Go plugin for protoc
+go get -u github.com/golang/protobuf/protoc-gen-go
+
+# Run the compiler
+protoc --go_out=. --go_opt=paths=source_relative pb/person.proto
 ```
 
-The magic is happening! 🎩✨
+This command creates a `person.pb.go` file containing the Go struct for our `Person` message, along with some helper functions.
 
-## Let's Get Coding!
+### 3. Use It in Go
 
-Check out your main file where the real fun begins:
+Now I can use the generated `Person` struct in my Go code just like any other struct.
 
 ```go
 package main
 
 import (
-	"example1/pb"
 	"fmt"
+	"log"
+
+	"github.com/golang/protobuf/proto"
+	"path/to/your/pb"
 )
 
 func main() {
-	var person pb.Person
+	person := &pb.Person{
+		Id:       1001,
+		Email:    "shubham@example.com",
+		IsActive: true,
+	}
 
-	person.Id = 1001
-	person.Email = "abc@xyz.in"
-	person.IsActive = true
+	// Serialize the person to the binary format
+	data, err := proto.Marshal(person)
+	if err != nil {
+		log.Fatal("marshaling error: ", err)
+	}
 
-	fmt.Println(&person)
+	// Print the raw bytes
+	fmt.Println("Raw bytes:", data)
+
+	// Deserialize the data back into a new person object
+	newPerson := &pb.Person{}
+	err = proto.Unmarshal(data, newPerson)
+	if err != nil {
+		log.Fatal("unmarshaling error: ", err)
+	}
+
+	// Print the new person's details
+	fmt.Println("Unmarshaled person:", newPerson)
 }
 ```
 
-Run the main file, and voila! Your project directory should now look like a wizard's spell book:
+### The Size Difference
 
-```bash
-.
- |-pb
- | |-person.proto
- | |-person.pb.go
- |-go.mod
- |-go.sum
- |-main.go
-```
-
-Run the main file:
-
-```bash
-# Start the magic!
-go run main.go
-```
-
-The console should light up with the details of our person. 🌟
-
-## Let's Share the Joy! 🚀
-
-Excited to dive into the code? You can find the entire codebase and follow along on [GitHub](https://github.com/sri-shubham/blogcode/tree/master/Getting_Started_In_Protobuf_With_Go). Feel free to fork, clone, and explore to your heart's content!
-
-## Moment of Truth
-
-Let's compare the difference in message size that we've been talking about. We'll compare the same data stored in JSON and protobuf serialized messages.
+One of the most interesting aspects of Protobuf is its compact size. To see this in action, I created another message to hold a list of people and compared the size of the serialized data to its JSON equivalent.
 
 ```proto
-// Person : Schema describing a person
 message PersonList {
   repeated Person persons = 1;
 }
 ```
 
-Now we will take this new message, publish data, and serialize to see the difference in size.
+After serializing a list of three people, the results were pretty clear:
+-   **Protobuf size**: 63 bytes
+-   **JSON size**: 124 bytes
 
-```go
-func main() {
-	var list pb.PersonList
+While this is a small example, you can see how the savings would add up in a system that processes millions of messages.
 
-	list.Persons = append(list.Persons, &pb.Person{
-		Id:       1001,
-		Email:    "JonDoe@xyz.com",
-		IsActive: false,
-	})
-
-	list.Persons = append(list.Persons, &pb.Person{
-		Id:       1002,
-		Email:    "Ronald@xyz.com",
-		IsActive: false,
-	})
-
-	list.Persons = append(list.Persons, &pb.Person{
-		Id:       1003,
-		Email:    "Harold@xyz.com",
-		IsActive: false,
-	})
-
-	pbout, err := proto.Marshal(&list)
-	if err != nil {
-		panic(err)
-	}
-
-	jsonOut, err := json.Marshal(list)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("length of protoOut", len(pbout))
-	fmt.Println
-
-("length of jsonOut", len(jsonOut))
-}
-```
-
-The program output should look like this:
-
-```bash
-# Witness the magic!
-go run main.go
-```
-
-Output:
-
-```bash
-length of protoOut 63
-length of jsonOut 124
-```
-
-The console reveals the lengths of `protoOut` and `jsonOut`. The power of Protobuf in action! 🚀
-
-Feel the thrill? Dive into the code and explore the wonders of Protobuf with Go. Happy coding!
+I hope this gives you a good starting point for exploring Protobuf in your own Go projects. It's a powerful tool to have in your arsenal, and once you get used to the workflow, it can make your data handling much more robust and efficient.

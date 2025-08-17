@@ -7,198 +7,140 @@ tags = ["CockroachDB", "SQL", "Distributed", "bash", "docker", "docker-compose"]
 draft = false
 +++
 
-I spent an afternoon getting CockroachDB running locally with TLS and wrote this up so you don't have to repeat my mistakes.
+I spent a good chunk of an afternoon wrestling with TLS certificates and Docker networking to get a secure, multi-node CockroachDB cluster running on my local machine. I'm writing this down mostly so I don't have to figure it out all over again, and hopefully, it saves you some time too.
 
-Short version: it's possible, it's useful, and you'll probably hit a SAN mismatch at least once.
+The main takeaway? It's totally doable, and it's a great way to experiment with a distributed SQL setup. Also, you will almost certainly mess up a SAN (Subject Alternative Name) in a certificate at least once.
 
-## TL;DR
+## The Goal
 
-- Create a tiny CA
-- Issue node certs with SANs
-- Run three Cockroach containers on a custom Docker network
-- Initialize the cluster and mint a short-lived client cert
+I wanted a simple, repeatable way to spin up a local, TLS-enabled CockroachDB cluster. This is perfect for testing application logic against a secure, distributed database without touching any cloud resources.
 
-## Why bother
+## The Game Plan
 
-I wanted a local, TLS-enabled CockroachDB cluster to experiment with replication and TLS without touching production. This is a minimal, repeatable setup for development and debugging.
+Here's the high-level approach I took:
+1.  **Become a Certificate Authority (CA)**: Just for our local machine, of course.
+2.  **Issue Certificates**: Create and sign certificates for each of the three CockroachDB nodes.
+3.  **Docker Network**: Set up a dedicated Docker network so the nodes can talk to each other using predictable IP addresses.
+4.  **Compose FTW**: Write a `docker-compose.yml` to define and run the three-node cluster.
+5.  **Initialize**: Start the cluster and run the `cockroach init` command.
 
-## What you need
+## The Nitty-Gritty
 
-- OpenSSL
-- Docker & Docker Compose
+Here are the commands and configs I used.
 
-## Plan (short)
+### 1. Create a Local CA
 
-1. Create a CA
-2. Generate keys and CSRs for three nodes
-3. Sign CSRs with SANs
-4. Run containers on a custom network
-5. Initialize the cluster and create a client cert
-
-### 1) Create a CA
+First, we need a directory to store our certificates and a simple script to create our own CA.
 
 ```bash
 mkdir -p certs/ca
 
+# Create the CA key and certificate
 openssl genrsa -out certs/ca/ca.key 2048
-openssl req -x509 -nodes -days 365 -key certs/ca/ca.key -out certs/ca/ca.crt -subj '/CN=LocalCA/O=CA/C=IN'
+openssl req -x509 -nodes -days 365 -key certs/ca/ca.key -out certs/ca/ca.crt -subj '/CN=LocalCA'
 ```
 
-Verify files:
+### 2. Create Node Certificates
+
+Now, we'll generate a key and a certificate signing request (CSR) for each of our three nodes.
 
 ```bash
-ls -l certs/ca
-# ca.crt and ca.key should be present
-```
-
-### 2) Keys & CSRs for each node
-
-Create private keys and CSRs for three nodes.
-
-```bash
+# Create directories for each node's certs
 mkdir -p certs/node1 certs/node2 certs/node3
 
-openssl genrsa -out certs/node1/node.key 2048
-openssl genrsa -out certs/node2/node.key 2048
-openssl genrsa -out certs/node3/node.key 2048
-
-openssl req -new -key certs/node1/node.key -out certs/node1/node.csr -subj '/CN=node/O=LocalCockroachNode1/C=IN'
-openssl req -new -key certs/node2/node.key -out certs/node2/node.csr -subj '/CN=node/O=LocalCockroachNode2/C=IN'
-openssl req -new -key certs/node3/node.key -out certs/node3/node.csr -subj '/CN=node/O=LocalCockroachNode3/C=IN'
+# Generate keys and CSRs
+for i in 1 2 3; do
+    openssl genrsa -out certs/node$i/node.key 2048
+    openssl req -new -key certs/node$i/node.key -out certs/node$i/node.csr -subj "/CN=node$i"
+done
 ```
 
-### 3) Sign the CSRs with SANs
+### 3. Sign the Node Certificates (The Tricky Part)
 
-Your node certificates must include SANs (IP/DNS) matching what the container uses. On macOS/linux you can use process substitution; otherwise write the SAN section to a temporary file and pass `-extfile`.
+This is where the magic—and the potential for mistakes—happens. When we sign the CSRs, we need to include the correct SANs. Each certificate needs to be valid for the node's IP address inside the Docker network and its DNS name.
 
 ```bash
+# Sign node1's certificate
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.11,DNS:roach1"
-openssl x509 -req -in ./certs/node1/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node1/node.crt -days 3650 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
+openssl x509 -req -in ./certs/node1/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node1/node.crt -days 365 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
 
+# Sign node2's certificate
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.12,DNS:roach2"
-openssl x509 -req -in ./certs/node2/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node2/node.crt -days 3650 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
+openssl x509 -req -in ./certs/node2/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node2/node.crt -days 365 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
 
+# Sign node3's certificate
 SAN_PARAM="[SAN]\nsubjectAltName=IP:10.5.0.13,DNS:roach3"
-openssl x509 -req -in ./certs/node3/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node3/node.crt -days 3650 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
+openssl x509 -req -in ./certs/node3/node.csr -CA ./certs/ca/ca.crt -CAkey ./certs/ca/ca.key -CAcreateserial -out ./certs/node3/node.crt -days 365 -extfile <(echo -e "$SAN_PARAM") -extensions SAN
 ```
 
-Short note: I used long lifetimes for convenience locally — don't do this in production.
+**Note**: If your shell doesn't support process substitution (`<(...)`), you'll need to write the SAN parameters to a temporary file and use the `-extfile` flag with that file's path.
 
-### 4) Docker Compose: minimal example
+### 4. The `docker-compose.yml`
 
-Drop this into `docker-compose.yml` and adjust the subnet/ports if needed. Volumes mount cert folders so Cockroach can pick them up.
+This file ties everything together. It defines our three `roach` services, sets up the `roachnet` network with static IPs, and mounts the certificates into each container.
 
 ```yaml
 version: '3'
 
 services:
-    roach1:
-        image: cockroachdb/cockroach:v23.2.4
-        container_name: roach1
-        hostname: roach1
-        stop_grace_period: 10s
-        environment:
-            COCKROACH_URL: "postgresql://10.5.0.11:26257/defaultdb?sslmode=verify-full&sslrootcert=/cockroach/cockroach-certs/ca.crt"
-        networks:
-            roachnet:
-                ipv4_address: 10.5.0.11
-        ports:
-            - "26257:26257"
-            - "9091:8080"
-        volumes:
-            - roach1:/cockroach/cockroach-data
-            - ./certs/node1:/cockroach/cockroach-certs
-            - ./certs/ca:/cockroach/ca
-        command: start --advertise-addr=10.5.0.11:26357 --http-addr=10.5.0.11:8080 --listen-addr=10.5.0.11:26357 --sql-addr=10.5.0.11:26257 --join=10.5.0.11:26357,10.5.0.12:26357,10.5.0.13:26357 --certs-dir=/cockroach/cockroach-certs
+  roach1:
+    image: cockroachdb/cockroach:v23.2.4
+    container_name: roach1
+    hostname: roach1
+    networks:
+      roachnet:
+        ipv4_address: 10.5.0.11
+    ports:
+      - "26257:26257"
+      - "8080:8080" # Web UI for roach1
+    volumes:
+      - ./certs/node1:/cockroach/cockroach-certs
+      - ./certs/ca/ca.crt:/cockroach/ca.crt
+    command: start --certs-dir=/cockroach/cockroach-certs --advertise-addr=roach1 --join=roach1,roach2,roach3
 
-    roach2:
-        image: cockroachdb/cockroach:v23.2.4
-        container_name: roach2
-        hostname: roach2
-        stop_grace_period: 10s
-        environment:
-            COCKROACH_URL: "postgresql://10.5.0.12:26257/defaultdb?sslmode=verify-full&sslrootcert=/cockroach/cockroach-certs/ca.crt"
-        networks:
-            roachnet:
-                ipv4_address: 10.5.0.12
-        ports:
-            - "26258:26257"
-            - "9092:8080"
-        volumes:
-            - roach2:/cockroach/cockroach-data
-            - ./certs/node2:/cockroach/cockroach-certs
-            - ./certs/ca:/cockroach/ca
-        command: start --advertise-addr=10.5.0.12:26357 --http-addr=10.5.0.12:8080 --listen-addr=10.5.0.12:26357 --sql-addr=10.5.0.12:26257 --join=10.5.0.11:26357,10.5.0.12:26357,10.5.0.13:26357 --certs-dir=/cockroach/cockroach-certs
+  roach2:
+    image: cockroachdb/cockroach:v23.2.4
+    container_name: roach2
+    hostname: roach2
+    networks:
+      roachnet:
+        ipv4_address: 10.5.0.12
+    volumes:
+      - ./certs/node2:/cockroach/cockroach-certs
+      - ./certs/ca/ca.crt:/cockroach/ca.crt
+    command: start --certs-dir=/cockroach/cockroach-certs --advertise-addr=roach2 --join=roach1,roach2,roach3
 
-    roach3:
-        image: cockroachdb/cockroach:v23.2.4
-        container_name: roach3
-        hostname: roach3
-        stop_grace_period: 10s
-        environment:
-            COCKROACH_URL: "postgresql://10.5.0.13:26257/defaultdb?sslmode=verify-full&sslrootcert=/cockroach/cockroach-certs/ca.crt"
-        networks:
-            roachnet:
-                ipv4_address: 10.5.0.13
-        ports:
-            - "26259:26257"
-            - "9093:8080"
-        volumes:
-            - roach3:/cockroach/cockroach-data
-            - ./certs/node3:/cockroach/cockroach-certs
-            - ./certs/ca:/cockroach/ca
-        command: start --advertise-addr=10.5.0.13:26357 --http-addr=10.5.0.13:8080 --listen-addr=10.5.0.13:26357 --sql-addr=10.5.0.13:26257 --join=10.5.0.11:26357,10.5.0.12:26357,10.5.0.13:26357 --certs-dir=/cockroach/cockroach-certs
+  roach3:
+    image: cockroachdb/cockroach:v23.2.4
+    container_name: roach3
+    hostname: roach3
+    networks:
+      roachnet:
+        ipv4_address: 10.5.0.13
+    volumes:
+      - ./certs/node3:/cockroach/cockroach-certs
+      - ./certs/ca/ca.crt:/cockroach/ca.crt
+    command: start --certs-dir=/cockroach/cockroach-certs --advertise-addr=roach3 --join=roach1,roach2,roach3
 
 networks:
-    roachnet:
-        driver: bridge
-        ipam:
-            config:
-                - subnet: 10.5.0.0/24
-                    gateway: 10.5.0.1
-
-volumes:
-    roach1:
-    roach2:
-    roach3:
-
+  roachnet:
+    ipam:
+      config:
+        - subnet: 10.5.0.0/24
 ```
 
-### 5) Copy the CA into node folders
+### 5. Bring It to Life
+
+Now for the moment of truth. Start the cluster and initialize it.
 
 ```bash
-cp certs/ca/ca.crt certs/node1/
-cp certs/ca/ca.crt certs/node2/
-cp certs/ca/ca.crt certs/node3/
-```
-
-### Start, initialize and test
-
-Bring everything up and create a short-lived client certificate for the `root` user, then initialize the cluster from one node:
-
-```bash
+# Start the containers in the background
 docker compose up -d
-docker ps --filter name=roach
 
-# create a short-lived client cert and initialize the cluster
-docker exec roach1 ./cockroach cert create-client root --certs-dir=/cockroach/cockroach-certs --ca-key=/cockroach/ca/ca.key --lifetime=24h
-docker exec roach1 ./cockroach --host=roach1:26357 --certs-dir=/cockroach/cockroach-certs init
+# Initialize the cluster by running the command on one of the nodes
+docker exec roach1 ./cockroach init --certs-dir=/cockroach/cockroach-certs
 ```
 
-If something breaks, start by checking SANs — they caused most of my issues.
+If everything worked, you should be able to access the CockroachDB UI at `http://localhost:8080` and see your three-node cluster up and running securely.
 
-### Quick tips
-
-- SAN mismatches are the most common issue.
-- If your shell doesn't support `<(...)`, write SANs to a temp file and use `-extfile`.
-- If host ports conflict, change the left side of the `ports` mapping.
-
-### Wrapping up
-
-This is intentionally short and practical — the code blocks do the heavy lifting. If you'd like I can add:
-
-- A small bash script that creates the CA, signs the certs, and prepares the folders
-- A Makefile target to `up`/`down` the cluster and clean artefacts
-- A short section showing how to connect from the host using the generated client certs
-
-Which of the above should I add next?
+This was a fun little project, and it's incredibly useful for local development. If you run into trouble, double-check your SANs—that's what got me the first few times. I hope this helps you get your own local, secure cluster running!

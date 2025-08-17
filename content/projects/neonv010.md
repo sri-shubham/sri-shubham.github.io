@@ -1,30 +1,23 @@
 +++
 title = "Neon v0.1.0: A Personal Go HTTP Framework"
-date = "2024-08-16T10:00:00Z"
+date = "2025-08-16T00:00:00Z"
 draft = false
 tags = ["golang", "http", "framework", "api", "rest", "release", "announcement"]
 author = "Shubham Srivastava"
 description = "Sharing Neon v0.1.0 - A lightweight, zero-dependency REST framework for Go that I built to simplify API development through struct tags."
 +++
 
-# Neon v0.1.0: A Personal Go HTTP Framework
+I'm excited to share the first release of **Neon (v0.1.0)**, a personal project that grew out of my desire to simplify how I build REST APIs in Go. I've always loved Go's standard library, and with the recent enhancements to `http.ServeMux` in Go 1.22, I saw an opportunity to create a lightweight, zero-dependency framework that felt both powerful and distinctly "Go."
 
-I'm excited to share **Neon v0.1.0** - a personal project I've been working on to create a lightweight, zero-dependency REST framework for Go. It's designed to simplify API development through struct tags and reduce the boilerplate I was tired of writing.
+## The "Why" Behind Neon
 
-## What I Built
+I built Neon to solve a problem I kept running into: writing the same boilerplate for every new API. I wanted a way to define routes, middleware, and API versions declaratively, without pulling in heavy external dependencies. My goal was to create something that leverages the power of the standard library while reducing repetitive code.
 
-### Built for Modern Go
-Neon is built from the ground up for Go 1.22+ and leverages the latest `http.ServeMux` enhancements. I wanted to create something that feels like pure Go while eliminating the repetitive code I found myself writing for every API project.
+### Sticking with the Standard Library
 
-### Zero External Dependencies
-I eliminated external dependencies by using Go 1.22's enhanced `net/http` package. This means:
-- **Smaller binaries** - No bloat from external packages
-- **Better security** - Fewer attack vectors and supply chain risks
-- **Faster builds** - No external dependencies to download
-- **Pure Go** - Leveraging the standard library's latest improvements
+A core principle for Neon was to have **zero external dependencies**. By building on top of Go 1.22's improved `http.ServeMux`, I could keep the framework lean and secure. This means smaller binaries, faster builds, and no supply chain risks—just pure Go.
 
-### Simple Go Features
-Neon requires Go 1.22+ and leverages the latest `http.ServeMux` enhancements:
+It also means that Neon plays nicely with the rest of the Go ecosystem. For example, extracting path parameters is as simple as calling `r.PathValue("id")`.
 
 ```go
 type UserService struct {
@@ -34,15 +27,18 @@ type UserService struct {
 }
 
 func (s UserService) GetUser(w http.ResponseWriter, r *http.Request) {
-    userID := r.PathValue("id")        // Clean parameter extraction
+    userID := r.PathValue("id") // Standard Go 1.22+ feature
     w.Write([]byte(fmt.Sprintf("User: %s", userID)))
 }
 ```
 
-## Key Features I Implemented
+## What I've Built So Far
 
-### 1. Struct Tag Configuration
-Define your API structure using struct tags (my favorite part):
+Here are some of the key features I've implemented in this first version:
+
+### 1. Declarative API Structure with Struct Tags
+
+This is my favorite part. You can define your entire API structure—routes, methods, middleware, and versions—using simple struct tags. It keeps the configuration right next to the code that uses it.
 
 ```go
 type BlogService struct {
@@ -65,38 +61,39 @@ type BlogService struct {
 }
 ```
 
-### 2. Three-Level Middleware System
-I implemented middleware at three levels for flexibility:
+### 2. A Flexible Middleware System
 
-- **Global**: Applied to all endpoints across your application
-- **Service**: Applied to all endpoints within a specific service
-- **Endpoint**: Applied only to specific endpoints
+I wanted middleware to be flexible, so I designed a three-level system:
+- **Global**: Applied to every request.
+- **Service-level**: Applied to all endpoints within a service.
+- **Endpoint-specific**: Applied only to a single handler.
 
 ```go
 // Global middleware
 app := neon.New()
-app.Use(loggingMiddleware)
-app.Use(corsMiddleware)
+app.Use(loggingMiddleware, corsMiddleware)
 
 // Service-level middleware
 type APIService struct {
     neon.Module `base:"/api" v:"1" middleware:"auth,rateLimit"`
-    // All endpoints inherit auth and rateLimit
+    // All endpoints here will use auth and rateLimit middleware
 }
 
 // Endpoint-specific middleware
 type AdminService struct {
     neon.Module `base:"/admin" v:"1"`
     dashboard   neon.Get `url:"/dashboard" middleware:"admin,audit"`
-    // Only dashboard endpoint gets admin and audit middleware
+    // The dashboard gets extra admin and audit middleware
 }
 ```
 
-### 3. Clean Routing
-- **Named path parameters** with simple extraction
-- **Multiple HTTP methods** on the same path
-- **Proper HTTP status codes** (real 404s and 405s)
-- **API versioning** support
+### 3. Clean and Powerful Routing
+
+Because it's built on the new `http.ServeMux`, Neon gets a lot of powerful routing features for free, like clean path parameter extraction, proper handling of HTTP methods, and support for API versioning.
+
+This is just the beginning, but I'm really happy with how it's turned out. It's been a great learning experience and has already made my personal projects much more fun to build.
+
+If you're interested in checking it out, you can find the source code and more examples on [GitHub](https://github.com/sri-shubham/neon). I'd love to hear any feedback or ideas you might have!
 
 ### 4. Good Developer Experience
 - **100% test coverage** - I'm pretty thorough with testing
@@ -113,32 +110,6 @@ I designed Neon with performance and simplicity in mind:
 - **Thread-safe** - Safe for concurrent use
 - **Well-tested** - Comprehensive test suite
 
-## Future Plans
-
-Here's what I'm thinking about for future versions:
-
-### v0.2.0 - More Developer Tools (Q4 2025)
-- **OpenAPI/Swagger integration** - Auto-generate docs
-- **Request/response validation** - Built-in validation
-- **Hot reload** - Development server improvements
-- **CLI tool** - Project scaffolding
-- **Metrics support** - Basic Prometheus metrics
-
-### v0.3.0 - Advanced Features (Q1 2026)
-- **WebSocket support** - Real-time capabilities
-- **Caching layer** - HTTP caching
-- **Rate limiting** - Request throttling
-- **Background jobs** - Simple job queue
-
-### v0.4.0 - Enterprise-ish Features (Q2 2026)
-- **Distributed tracing** - OpenTelemetry integration
-- **Health checks** - Monitoring endpoints
-- **Circuit breaker** - Resilience patterns
-
-### v1.0.0 - Stable API (Q3 2026)
-- **API stability** - No more breaking changes
-- **Performance optimizations** - Make it faster
-- **Better documentation** - Comprehensive guides
 
 ## Contributing
 

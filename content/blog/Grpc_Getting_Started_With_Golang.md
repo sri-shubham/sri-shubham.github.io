@@ -7,39 +7,34 @@ draft= false
 image="/images/home.png"
 author = "Shubham Srivastava"
 +++
-go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-go run server.go
-go run server.go
-go run client.go
+I've always found that the best way to understand a technology is to build something with it. This post is my attempt to distill the process of creating a simple gRPC service in Go into a straightforward, no-frills guide. We'll build a basic `Calculator` service that can multiply two numbers—a "hello world" for RPC.
 
-Hey — let's make this quick and practical. This post walks through building a tiny gRPC service in Go (a simple multiplier), keeping the steps copy/paste-friendly.
+## The "Why"
 
-## TL;DR
+I wanted a clear, practical example to refer back to. Something that cuts through the noise and focuses on the core steps: defining the service, generating the code, and getting a client and server to talk to each other.
 
-- Define a proto with a service and messages
-- Generate Go code with protoc plugins
-- Implement the server, run it, and call it from a client
+## The Game Plan
 
-## Prerequisites
+1.  **Define the Service**: We'll use a `.proto` file to define our `Calculator` service and its methods.
+2.  **Generate the Code**: We'll use `protoc` to generate the Go code for our client and server.
+3.  **Implement the Server**: We'll write the logic for our `Multiply` method.
+4.  **Implement the Client**: We'll write a simple client to call our server.
 
-- Go toolchain
-- protoc compiler
-- protoc Go plugins (see commands below)
+## The Nitty-Gritty
 
-Grab the example code from the repo if you want to follow along.
+Here’s how I did it.
 
-### Install code generator plugins
+### 1. Define the Service in a `.proto` File
 
-```bash
-go get -u github.com/golang/protobuf/protoc-gen-go
-go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-```
-
-### Define a tiny service
-
-In your .proto file define a service and the messages. Example:
+First, I created a `.proto` file to define the service. It has one method, `Multiply`, which takes two numbers and returns one.
 
 ```proto
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
 service Calculator {
    rpc Multiply(TwoNumbers) returns (Number) {}
 }
@@ -54,58 +49,96 @@ message Number {
 }
 ```
 
-Compile the proto into Go code (adjust flags to your setup):
+### 2. Generate the Go Code
+
+With the `.proto` file ready, I used `protoc` and its Go plugins to generate the necessary client and server code.
 
 ```bash
-protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative pb/*.proto
+# Make sure you have the plugins
+go get -u google.golang.org/grpc
+go get -u github.com/golang/protobuf/protoc-gen-go
+
+# Run the generator
+protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    pb/service.proto
 ```
 
-### Implement the server
+This command creates the Go files with all the types and interfaces we need.
 
-Create a Go type implementing the generated interface and register it with a gRPC server:
+### 3. Implement the Server
+
+Next, I wrote the server. It needs to satisfy the `CalculatorServer` interface that `protoc` generated.
 
 ```go
-// Calculator : Implements Calculator Service
-type Calculator struct{}
+package main
 
-// Multiply Implementation of Multiply interface
-func (c *Calculator) Multiply(ctx context.Context, in *pb.TwoNumbers) (*pb.Number, error) {
-   return &pb.Number{Num: in.Num1 * in.Num2}, nil
+import (
+	"context"
+	"log"
+	"net"
+
+	"google.golang.org/grpc"
+	"path/to/your/pb"
+)
+
+// server implements the CalculatorServer interface
+type server struct {
+	pb.UnimplementedCalculatorServer
 }
 
-// Register and start
-lis, err := net.Listen("tcp", ":8081")
-if err != nil {
-   log.Fatalf("failed to listen: %v", err)
+// Multiply implements the Multiply RPC method
+func (s *server) Multiply(ctx context.Context, in *pb.TwoNumbers) (*pb.Number, error) {
+	log.Printf("Received: %v and %v", in.GetNum1(), in.GetNum2())
+	return &pb.Number{Num: in.GetNum1() * in.GetNum2()}, nil
 }
 
-grpcServer := grpc.NewServer()
-pb.RegisterCalculatorServer(grpcServer, &server.Calculator{})
-log.Fatal(grpcServer.Serve(lis))
+func main() {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterCalculatorServer(s, &server{})
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
 ```
 
-Run the server:
+### 4. Implement the Client
 
-```bash
-go run server.go
-```
-
-### Implement the client
-
-Dial the server and call the RPC:
+Finally, I wrote a client to connect to the server and call the `Multiply` method.
 
 ```go
-conn, err := grpc.Dial(":8081", grpc.WithInsecure())
-client := pb.NewCalculatorClient(conn)
-val, err := client.Multiply(context.Background(), &pb.TwoNumbers{Num1: 3, Num2: 4})
+package main
+
+import (
+	"context"
+	"log"
+	"time"
+
+	"google.golang.org/grpc"
+	"path/to/your/pb"
+)
+
+func main() {
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewCalculatorClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	r, err := c.Multiply(ctx, &pb.TwoNumbers{Num1: 5, Num2: 10})
+	if err != nil {
+		log.Fatalf("could not multiply: %v", err)
+	}
+	log.Printf("Result: %d", r.GetNum())
+}
 ```
 
-Run the client:
-
-```bash
-go run client.go
-```
-
-If you see a response like `num:12`, you are done. If not, confirm the server is listening on the expected port and that the generated pb files are in place.
-
-That's it — small, practical, and easy to extend when you add streaming or auth.
+And that's it. When you run the server and then the client, you'll see the client print the result of the multiplication. It's a simple example, but it's a solid foundation to build on. I hope this straightforward approach helps you get started with gRPC in Go!
