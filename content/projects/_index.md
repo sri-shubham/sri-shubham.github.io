@@ -3,4 +3,4 @@ title = "Projects ✨"
 draft = false
 +++
 
-👩‍💻 Exploring the digital universe one project at a time! Join me in this code carnival, where each project is a tech-tastic rollercoaster. From bits to beauty, let's embark on a pixel-perfect journey through my portfolio playground! 🌐✨"
+A selection of open-source projects focused on high-performance backend infrastructure, developer experience, and AI integration. These tools are born from a need for better abstractions in production environments.
