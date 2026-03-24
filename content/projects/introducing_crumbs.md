@@ -1,5 +1,5 @@
 +++
-title="Introducing Crumbs: A Rich Error Handling Library for Go"
+title="Crumbs: Context-Aware Error Handling for Go"
 date=2025-08-17T00:00:00+00:00
 draft=false
 tags=["go", "golang", "error-handling", "open-source", "development"]

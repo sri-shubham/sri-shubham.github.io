@@ -45,8 +45,8 @@ ignoreErrors = ["error-disable-taxonomy"]
   disableSpecial1stPost=true
 
 [params.homeInfoParams]
-  Title = "Hello, World! ✨"
-  Content = "Step into the enchanting realm where code dances with creativity! 👨‍💻✨ I'm Shubham, your tech maestro on this digital odyssey. Explore the wonders of Golang, unravel the magic of microservices, and immerse yourself in all things geeky. Together, let's transform aspirations into digital masterpieces – are you prepared for a tech-tastic journey? 🌐🚀"
+  Title = "Senior Backend Engineer & Distributed Systems Specialist"
+  Content = "8+ years of experience building resilient systems with Go, Microservices, and Cloud Infrastructure. Currently focused on the intersection of scalable backend architecture and Production AI."
 
 [[params.socialIcons]]
   name = "Github"

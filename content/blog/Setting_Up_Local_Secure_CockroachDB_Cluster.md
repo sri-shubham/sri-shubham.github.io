@@ -4,7 +4,7 @@ date = "2024-04-14T10:53:17+05:30"
 author = "Shubham Srivastava"
 description = "Learn how to set up a secure CockroachDB cluster on Docker, step-by-step."
 tags = ["CockroachDB", "SQL", "Distributed", "bash", "docker", "docker-compose"]
-draft = false
+draft = true
 +++
 
 I spent a good chunk of an afternoon wrestling with TLS certificates and Docker networking to get a secure, multi-node CockroachDB cluster running on my local machine. I'm writing this down mostly so I don't have to figure it out all over again, and hopefully, it saves you some time too.

@@ -3,7 +3,7 @@ title = "Neon: Light Up Your API with Golang Magic ✨"
 date = "2024-01-13T10:45:43+05:30"
 description = "A sleek Rest framework that effortlessly lights up your API development, using struct tags for that extra bit of handler magic."
 tags = ["Go", "REST", "API", "Framework", "side project"]
-draft = false
+draft = true
 author = "Shubham Srivastava"
 +++
 

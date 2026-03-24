@@ -4,7 +4,7 @@ date = "2021-02-06T16:53:17+05:30"
 author = "Shubham Srivastava"
 description = "Unraveling the mysteries of protocol buffers and diving into the world of Go - Let the fun begin!"
 tags = ["Go", "Protobuf", "Protocol Buffer"]
-draft = false
+draft = true
 +++
 
 Protocol Buffers (or Protobuf) are one of those technologies that I've come to appreciate more and more over time. At first glance, they can seem a bit more complex than good old JSON, but once you get the hang of them, they offer a powerful way to structure and serialize data. This post is a quick, hands-on guide to getting started with Protobuf in Go, based on my own experience.

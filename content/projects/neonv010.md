@@ -1,10 +1,10 @@
 +++
-title = "Neon v0.1.0: A Personal Go HTTP Framework"
+title = "Neon: High-Performance Go Web Framework"
 date = "2025-08-16T00:00:00Z"
 draft = false
 tags = ["golang", "http", "framework", "api", "rest", "release", "announcement"]
 author = "Shubham Srivastava"
-description = "Sharing Neon v0.1.0 - A lightweight, zero-dependency REST framework for Go that I built to simplify API development through struct tags."
+description = "Sharing Neon a lightweight, zero-dependency REST framework for Go that I built to simplify API development through struct tags."
 +++
 
 I'm excited to share the first release of **Neon (v0.1.0)**, a personal project that grew out of my desire to simplify how I build REST APIs in Go. I've always loved Go's standard library, and with the recent enhancements to `http.ServeMux` in Go 1.22, I saw an opportunity to create a lightweight, zero-dependency framework that felt both powerful and distinctly "Go."
