@@ -14,7 +14,7 @@ It's 2 AM. Your pager goes off. A microservice is failing in production, and the
 
 You know *what* happened, but you have absolutely no idea *where* or *why*. Was it the payment gateway? The user profile fetch? Which user? Which transaction ID? You spend three grueling hours digging through distributed traces, cross-referencing timestamps across different services, just because the error didn't carry enough context. 
 
-Error handling in Go is famous for its simplicity—the ubiquitous `if err != nil` pattern is beautifully explicit. But in large-scale distributed systems, simplicity without context is a liability. When an error is just a string, it loses all the rich, structured data that was available at the moment it occurred.
+Error handling in Go is famous for its simplicity the ubiquitous `if err != nil` pattern is beautifully explicit. But in large scale distributed systems, simplicity without context is a liability. When an error is just a string, it loses all the rich, structured data that was available at the moment it occurred.
 
 ## Current Limitations: Why Reinvent the Wheel?
 
@@ -41,7 +41,7 @@ Crumbs is designed to play nicely with modern Go observability. Because the stru
 
 ## Show, Don't Just Tell
 
-Let's look at how this plays out in a real-world scenario, like a database repository function or a middleware handler, where multiple layers of context are added.
+Let's look at how this plays out in a real world scenario, like a database repository function or a middleware handler, where multiple layers of context are added.
 
 **The Bad Example (String Formatting):**
 ```go
