@@ -1,5 +1,5 @@
 +++
-title = "Software Wizard ✨"
+title = "Senior Backend Engineer & Distributed Systems Specialist"
 date = "2024-01-13T10:45:43+05:30"
 draft = false
 +++
