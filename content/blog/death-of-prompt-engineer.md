@@ -1,6 +1,6 @@
 +++
 title = "The Death of the 'Prompt Engineer,' the Rise of the 'Agent Architect'"
-date = "2024-03-29T18:15:49+05:30"
+date = "2026-03-29T18:15:49+05:30"
 description = "Witnessing the fundamental shift from Prompt Engineering to Agentic Workflows and Agent Architectures."
 tags = ["AI", "Agents", "Architecture", "Gemini", "MCP"]
 draft = false
