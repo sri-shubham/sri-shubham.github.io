@@ -9,7 +9,6 @@ author = "Shubham Srivastava"
 
 Repo: [Neon on GitHub](https://github.com/sri-shubham/neon)
 
-### (•ㅅ•) shubham@terminal:~$ cat intro.txt
 #### The Pursuit of Minimalism in Go Web APIs
 
 With the release of Go 1.22, the game changed for `http.ServeMux`. The standard library finally gained the routing power it deserved, leading to a fundamental question: Do we still need massive frameworks for modern microservices?
@@ -22,7 +21,6 @@ Minimalism in software isn't about having fewer features; it's about having exac
 
 ---
 
-### (•ㅅ•) shubham@terminal:~$ ls -l /motivation
 #### The “Why” Behind Neon
 
 **The Boilerplate Problem:** 
@@ -36,7 +34,6 @@ Neon is for the pragmatist. If you want the power and stability of the Go standa
 
 ---
 
-### (•ㅅ•) shubham@terminal:~$ ./view_feature.sh --declarative
 #### The Magic of Declarative Routing
 
 **The Concept:** 
@@ -59,7 +56,6 @@ This approach makes the project structure navigable as it scales. You can look a
 
 ---
 
-### (•ㅅ•) shubham@terminal:~$ sudo debug --deep
 #### Under the Hood: Reflection & The Hot Path
 
 **The Implementation:** 
