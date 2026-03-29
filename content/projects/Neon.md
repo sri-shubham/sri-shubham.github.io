@@ -1,80 +1,76 @@
 +++
-title = "Neon: Light Up Your API with Golang Magic ✨"
+title = "Neon: A Lightweight, Zero-Dependency Go HTTP Framework"
 date = "2024-01-13T10:45:43+05:30"
-description = "A sleek Rest framework that effortlessly lights up your API development, using struct tags for that extra bit of handler magic."
-tags = ["Go", "REST", "API", "Framework", "side project"]
-draft = true
+description = "The Pursuit of Minimalism in Go Web APIs - Building a high-velocity developer experience without the dependency tree."
+tags = ["Go", "REST", "API", "Framework", "Architecture"]
+draft = false
 author = "Shubham Srivastava"
 +++
 
 Repo: [Neon on GitHub](https://github.com/sri-shubham/neon)
 
-I've always been fascinated by how a little bit of structure can make code feel so much cleaner. That's the idea behind Neon, a small REST framework I built for Go. I wanted to see if I could use struct tags to define API routes and middleware, turning what's usually a block of repetitive code into something more declarative and, honestly, more fun.
+### (•ㅅ•) shubham@terminal:~$ cat intro.txt
+#### The Pursuit of Minimalism in Go Web APIs
 
-### The Magic of Struct Tags
+With the release of Go 1.22, the game changed for `http.ServeMux`. The standard library finally gained the routing power it deserved, leading to a fundamental question: Do we still need massive frameworks for modern microservices?
 
-The core idea of Neon is to use struct tags to attach metadata to your HTTP handlers. Instead of manually wiring up routes, you can define them right alongside your service's methods.
+**The Engineering Stance:** 
+Neon isn't a "love-hate" response to existing tools; it's a technical challenge. Can we build a high-velocity developer experience without a 50MB dependency tree? By building directly on top of `net/http`, Neon maintains a "Standard Library First" architecture, ensuring long-term maintainability and zero external bloat.
 
-Here's what it looks like in practice:
+**The Philosophy:** 
+Minimalism in software isn't about having fewer features; it's about having exactly what you need with zero overhead. Neon is designed for developers who value deep understanding over "magic" abstractions.
 
+---
+
+### (•ㅅ•) shubham@terminal:~$ ls -l /motivation
+#### The “Why” Behind Neon
+
+**The Boilerplate Problem:** 
+In every microservice I built, I found myself writing the same repetitive logic: manual path parameter parsing, boilerplate middleware chains, and scattered route registration. This boilerplate doesn't add value—it adds noise.
+
+**The Goal:** 
+Neon aims to be a thin wrapper that adds velocity without adding weight. It transforms imperative route registration into declarative structures, keeping your API's intent clear and centralized.
+
+**The Audience:** 
+Neon is for the pragmatist. If you want the power and stability of the Go standard library but the clean, struct-tag syntax of a modern framework, Neon is built for you.
+
+---
+
+### (•ㅅ•) shubham@terminal:~$ ./view_feature.sh --declarative
+#### The Magic of Declarative Routing
+
+**The Concept:** 
+In Neon, your API surface area is defined by your data structures. Using struct tags, we move routing logic out of a giant `main.go` and into the handlers themselves.
+
+**The Visual:**
 ```go
-// UserService is a container for our handlers
-type UserService struct {
-    // This defines the base route, version, and middleware for the whole service
-    neon.Module `base:"/user" v:"1" middleware:"UserCtx"`
-
-    // These fields represent our handlers
-    getUser     neon.Get `middleware:"ReqID"`
-    getUserByID neon.Get `base:"/{:id}" middleware:"ReqID"`
-}
-
-// GetUser is a standard http.HandlerFunc
-func (s UserService) GetUser(w http.ResponseWriter, r *http.Request) {
-    fmt.Println(r)
-    fmt.Fprintf(w, fmt.Sprint(r.Header))
-}
-
-// UserCtx is a middleware specific to this service
-func (s UserService) UserCtx(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        fmt.Println("Received Request on User", runtime.FuncForPC(reflect.ValueOf(next).Pointer()).Name())
-        next.ServeHTTP(w, r)
-    })
+type TaskService struct {
+    neon.Module `base:"/tasks" v:"1" middleware:"Auth"`
+    
+    // Declarative endpoint definition
+    getTasks   neon.Get    `url:"/"`
+    getTask    neon.Get    `url:"/{id}"`
+    createTask neon.Post   `url:"/" middleware:"RateLimit"`
 }
 ```
 
-By reading the struct tags, Neon automatically figures out the routing:
-- The base route for `UserService` is `/user/v1`.
-- `getUser` becomes a `GET` handler at `/user/v1`.
-- `getUserByID` becomes a `GET` handler at `/user/v1/{:id}`.
+**The Benefit:** 
+This approach makes the project structure navigable as it scales. You can look at any service struct and immediately understand its entire API contract and security posture without jumping between files.
 
-It’s a small shift, but it keeps the configuration right next to the implementation, which I find really helps with clarity.
+---
 
-### Setting It All Up
+### (•ㅅ•) shubham@terminal:~$ sudo debug --deep
+#### Under the Hood: Reflection & The Hot Path
 
-The setup is designed to be minimal. In your `main` function, you just create a new Neon app, register your services, and run it.
+**The Implementation:** 
+Neon uses reflection at boot time to analyze your service structs and map them to standard `http.Handler` functions. This "heavy lifting" is done once during registration, keeping the request-time "hot path" as lean as raw `net/http`.
 
-```go
-func main() {
-    // Create a new Neon server
-    app := neon.New()
-    app.Port = 9999
+**Middleware Chains:** 
+I implemented a three-level recursive middleware pattern (Global, Service, and Endpoint) that remains 100% compatible with standard `http.Handler`. This allows you to mix and match standard Go middleware with Neon-specific handlers seamlessly.
 
-    // Register global middleware
-    app.AddMiddleware(middleware.Logger)
+**Trade-offs:** 
+Performance is the elephant in the room. While reflection has a bad reputation, Neon's approach ensures that the reflection overhead is incurred only at startup. The micro-benchmark difference compared to raw `net/http` is negligible, while the developer ergonomics gain is substantial.
 
-    // Register named middleware that can be used in struct tags
-    app.RegisterMiddleware("UserCtx", UserService{}.UserCtx)
-    app.RegisterMiddleware("ReqID", middleware.RequestID)
+---
 
-    // Add our service
-    app.AddService(&UserService{})
-
-    // Run the server
-    fmt.Println(app.Run())
-}
-```
-
-This project was a fun exploration for me, and it’s turned into a tool I genuinely enjoy using for my personal projects. It’s lightweight, has no external dependencies, and brings a little bit of that declarative magic to Go.
-
-If you're curious, you can check out the full source code and more examples on [GitHub](https://github.com/sri-shubham/neon). Let me know what you think!
+Ready to simplify your Go APIs? Explore the full source and examples on [GitHub](https://github.com/sri-shubham/neon).
