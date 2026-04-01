@@ -46,7 +46,39 @@ ignoreErrors = ["error-disable-taxonomy"]
 
 [params.homeInfoParams]
   Title = "Senior Backend Engineer & Distributed Systems Specialist"
-  Content = "8+ years of experience building resilient systems with Go, Microservices, and Cloud Infrastructure. Currently focused on the intersection of scalable backend architecture and Production AI."
+  Content = """
+8+ years of experience building resilient systems with Go, Microservices, and Cloud Infrastructure. Currently focused on the intersection of scalable backend architecture and Production AI.
+
+<div style="margin-top: 25px; padding: 18px; border-radius: var(--radius); background: var(--entry); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); align-items: center; justify-content: center;">
+  <a href="https://credentials.databricks.com/26de8ee7-c323-43ce-8ff7-3578c73ea166?utm_source=linkedin&utm_medium=social" target="_blank" style="transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: block;">
+    <img src="https://templates.images.credential.net/17613129875092573230567689119660.png" width="77" alt="Databricks Certified Generative AI Engineer Associate" style="filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.08) translateY(-5px)'; this.style.filter='drop-shadow(0 10px 20px rgba(0,0,0,0.15))'" onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.filter='drop-shadow(0 5px 15px rgba(0,0,0,0.1))'">
+  </a>
+  
+  <div class="marquee-container">
+    <div class="marquee-content">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" class="tech-icon" alt="Go">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" class="tech-icon" alt="Docker">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" class="tech-icon" alt="Kubernetes">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" class="tech-icon" alt="Python">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="tech-icon" alt="PostgreSQL">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" class="tech-icon" alt="Redis">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" class="tech-icon aws-icon" alt="AWS">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" class="tech-icon" alt="GCP">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" class="tech-icon" alt="Terraform">
+      <!-- Duplicate for seamless scroll -->
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg" class="tech-icon" alt="Go">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" class="tech-icon" alt="Docker">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" class="tech-icon" alt="Kubernetes">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" class="tech-icon" alt="Python">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="tech-icon" alt="PostgreSQL">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" class="tech-icon" alt="Redis">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" class="tech-icon aws-icon" alt="AWS">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" class="tech-icon" alt="GCP">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" class="tech-icon" alt="Terraform">
+    </div>
+  </div>
+</div>
+"""
 
 [[params.socialIcons]]
   name = "Github"
@@ -74,11 +106,6 @@ name = "about"
 url = "/about/"
 weight = 30
 
-[[menu.main]]
-identifier = "CV"
-name = "cv"
-url = "/cv/"
-weight = 40
 
 
 [markup.goldmark.renderer]
