@@ -51,7 +51,7 @@ If a service cannot answer them early, it is not production-ready, no matter how
 
 A lot of reliability work is simply clarity work done early.
 
-## Prefer the Standard Library Longer Than Feels Fashionable
+## Default to the Standard Library
 
 One of Go’s biggest strengths is that the standard library is good enough for a surprisingly large number of production services.
 
