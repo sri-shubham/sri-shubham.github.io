@@ -5,6 +5,7 @@ description = "The Pursuit of Minimalism in Go Web APIs - Building a high-veloci
 tags = ["Go", "REST", "API", "Framework", "Architecture"]
 draft = false
 author = "Shubham Srivastava"
+github_repo = "sri-shubham/neon"
 +++
 
 Repo: [Neon on GitHub](https://github.com/sri-shubham/neon)

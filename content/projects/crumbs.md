@@ -5,6 +5,7 @@ draft=false
 tags=["go", "golang", "error-handling", "open-source", "development", "architecture"]
 categories=["Programming", "Open Source", "Software Engineering"]
 author="Shubham Srivastava"
+github_repo="sri-shubham/crumbs"
 description="Error handling in Go is intentionally simple, but in large-scale distributed systems, simplicity without context is a liability. Here is how Crumbs fixes that."
 +++
 
