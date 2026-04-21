@@ -1,0 +1,86 @@
+.support-section {
+    margin: 40px 0;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.support-card {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 30px;
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.support-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.support-icon {
+    position: relative;
+    color: var(--primary);
+    background: var(--entry);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.support-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.support-content p {
+    margin: 0 0 20px 0;
+    color: var(--secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.support-button {
+    display: inline-block;
+    padding: 10px 24px;
+    background: var(--primary);
+    color: var(--theme);
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.support-button:hover {
+    opacity: 0.95;
+    transform: scale(1.02);
+}
+
+/* Steam Animation */
+.steam-animation {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Micro-animations can be added here if needed, keeping it clean for now */
+
+@media (max-width: 650px) {
+    .support-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+}
+
+/* Dark mode overrides */
+.dark .support-card {
+    background: rgba(255, 255, 255, 0.02);
+}

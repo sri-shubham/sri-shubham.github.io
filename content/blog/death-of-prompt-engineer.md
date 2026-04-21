@@ -5,6 +5,7 @@ description = "Witnessing the fundamental shift from Prompt Engineering to Agent
 tags = ["AI", "Agents", "Architecture", "Gemini", "MCP"]
 draft = false
 author = "Shubham Srivastava"
+categories = ["AI", "Engineering", "Architecture"]
 +++
 
 ### The Catalyst: When the Chatbox Became a Bottleneck

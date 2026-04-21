@@ -1,0 +1,42 @@
+{{- $categories := .Params.categories -}}
+{{- $pages := where site.RegularPages "Permalink" "!=" .Permalink -}}
+{{- $related := (where $pages "Params.categories" "intersect" $categories) | first 3 -}}
+
+{{- /* Fallback to latest 3 if no same-category posts found */ -}}
+{{- if not $related -}}
+    {{- $related = $pages | first 3 -}}
+{{- end -}}
+
+{{- if $related -}}
+<div class="recommended-posts">
+    <h2 class="recommended-title">Recommended</h2>
+    <div class="recommended-grid">
+        {{- range $related -}}
+        <a href="{{ .Permalink }}" class="recommended-card">
+            <div class="card-content">
+                <div class="card-meta">
+                    {{- if in .RelPermalink "/blog/" -}}
+                        <span class="type-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </span>
+                    {{- else -}}
+                        <span class="type-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </span>
+                    {{- end -}}
+                    {{- with index .Params.categories 0 -}}
+                    <span class="card-category">{{ . }}</span>
+                    {{- end -}}
+                </div>
+                <h3 class="card-title">{{ .Title }}</h3>
+                <p class="card-desc">{{ .Description | truncate 80 }}</p>
+                <div class="card-footer">
+                    <span class="card-date">{{ .Date.Format "Jan 02, 2006" }}</span>
+                    <span class="read-more">Read →</span>
+                </div>
+            </div>
+        </a>
+        {{- end -}}
+    </div>
+</div>
+{{- end -}}
