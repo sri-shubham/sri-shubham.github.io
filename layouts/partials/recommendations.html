@@ -1,0 +1,148 @@
+{{- if .IsHome }}
+<section class="recommendations-section">
+  <h2>Recommendations</h2>
+
+  <div class="rec-carousel" id="rec-carousel">
+    <!-- Progress bar -->
+    <div class="rec-progress">
+      <div class="rec-progress-bar" id="rec-progress-bar"></div>
+    </div>
+
+    <!-- Navigation arrows -->
+    <button class="rec-nav rec-nav-prev" id="rec-prev" aria-label="Previous recommendation">‹</button>
+    <button class="rec-nav rec-nav-next" id="rec-next" aria-label="Next recommendation">›</button>
+
+    <!-- Slides -->
+    <div class="rec-track" id="rec-track">
+      <!-- Recommendation 1: Niladri Das -->
+      <div class="rec-slide">
+        <p class="rec-quote">
+          I had the distinct privilege of working with Shubham Srivastava for three years at Think Future Technologies, where he served as a Senior Backend Engineer. Shubham's deep, hands-on knowledge of building scalable, fault-tolerant distributed systems was a consistent source of guidance for our entire team. His architectural insights were critical, particularly in the effective use of Go to deliver high-throughput services. We frequently leveraged his expertise in configuring PostgreSQL for reliability, implementing RabbitMQ for resilient event pipelines, and designing backend systems that could handle production-grade workloads.
+        </p>
+        <a href="https://www.linkedin.com/in/sri-shubham" target="_blank" rel="noopener noreferrer" class="rec-author">
+          <div class="rec-author-avatar">ND</div>
+          <div class="rec-author-info">
+            <span class="rec-author-name">
+              Niladri Das
+              <span class="linkedin-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0077b5"><path d="M19 0H5a5 5 0 00-5 5v14a5 5 0 005 5h14a5 5 0 005-5V5a5 5 0 00-5-5zM8 19H5V8h3v11zM6.5 6.732c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zM20 19h-3v-5.604c0-3.368-4-3.113-4 0V19h-3V8h3v1.765c1.396-2.586 7-2.777 7 2.476V19z"/></svg>
+              </span>
+            </span>
+            <span class="rec-author-title">Senior Software Engineer L1, Think Future Technologies</span>
+            <span class="rec-author-relation">Worked with Shubham on the same team</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Recommendation 2: Vijay Krishan Gupta -->
+      <div class="rec-slide">
+        <p class="rec-quote">
+          I interviewed Shubham for a Golang Programmer position at Think Future Technologies during the Covid period. He answered my questions calmly and confidently, and I immediately felt we had found a strong candidate. Shubham proved that confidence right from day one. He joined the Kalido project and adapted quickly, much like fish takes to water. In almost all our monthly customer feedback, Shubham topped the list. His calm demeanor, technical brilliance, and leadership skills quickly established him as a leading technical expert at Think Future Technologies.
+        </p>
+        <a href="https://www.linkedin.com/in/sri-shubham" target="_blank" rel="noopener noreferrer" class="rec-author">
+          <div class="rec-author-avatar">VG</div>
+          <div class="rec-author-info">
+            <span class="rec-author-name">
+              Vijay Krishan Gupta
+              <span class="linkedin-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0077b5"><path d="M19 0H5a5 5 0 00-5 5v14a5 5 0 005 5h14a5 5 0 005-5V5a5 5 0 00-5-5zM8 19H5V8h3v11zM6.5 6.732c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zM20 19h-3v-5.604c0-3.368-4-3.113-4 0V19h-3V8h3v1.765c1.396-2.586 7-2.777 7 2.476V19z"/></svg>
+              </span>
+            </span>
+            <span class="rec-author-title">Founder & CEO, Think Future Technologies</span>
+            <span class="rec-author-relation">Senior to Shubham</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Dots -->
+    <div class="rec-dots" id="rec-dots">
+      <button class="rec-dot active" data-index="0" aria-label="Go to recommendation 1"></button>
+      <button class="rec-dot" data-index="1" aria-label="Go to recommendation 2"></button>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  const track = document.getElementById('rec-track');
+  const dots = document.querySelectorAll('.rec-dot');
+  const prevBtn = document.getElementById('rec-prev');
+  const nextBtn = document.getElementById('rec-next');
+  const progressBar = document.getElementById('rec-progress-bar');
+  const slides = track.querySelectorAll('.rec-slide');
+  const total = slides.length;
+  let current = 0;
+  let autoInterval;
+  let progressAnim;
+  const AUTO_DELAY = 8000; // 8 seconds per slide
+
+  function goTo(index) {
+    current = ((index % total) + total) % total;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function(d, i) {
+      d.classList.toggle('active', i === current);
+    });
+    resetProgress();
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  function resetProgress() {
+    clearInterval(autoInterval);
+    if (progressBar) {
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '0%';
+      // Force reflow
+      void progressBar.offsetWidth;
+      progressBar.style.transition = 'width ' + AUTO_DELAY + 'ms linear';
+      progressBar.style.width = '100%';
+    }
+    autoInterval = setTimeout(next, AUTO_DELAY);
+  }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      goTo(parseInt(this.dataset.index));
+    });
+  });
+
+  // Touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const carousel = document.getElementById('rec-carousel');
+
+  carousel.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  carousel.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    var diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? next() : prev();
+    }
+  }, { passive: true });
+
+  // Pause on hover
+  carousel.addEventListener('mouseenter', function() {
+    clearInterval(autoInterval);
+    if (progressBar) {
+      progressBar.style.transition = 'none';
+      var computed = getComputedStyle(progressBar).width;
+      progressBar.style.width = computed;
+    }
+  });
+
+  carousel.addEventListener('mouseleave', function() {
+    resetProgress();
+  });
+
+  // Start auto-rotation
+  resetProgress();
+})();
+</script>
+{{- end }}
