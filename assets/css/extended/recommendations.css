@@ -1,0 +1,247 @@
+/* ===== Recommendations Carousel ===== */
+
+.recommendations-section {
+  margin: 30px 0 10px;
+}
+
+.recommendations-section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recommendations-section h2 .rec-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Carousel wrapper */
+.rec-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--entry);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  min-height: 220px;
+}
+
+.rec-carousel:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Slides track */
+.rec-track {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.45, 0, 0.15, 1);
+  will-change: transform;
+}
+
+.rec-slide {
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Quote styling */
+.rec-quote {
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--content);
+  padding-left: 20px;
+  border-left: 3px solid var(--tertiary);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.rec-quote::before {
+  content: "\201C";
+  position: absolute;
+  top: -10px;
+  left: -4px;
+  font-size: 2.5rem;
+  color: var(--tertiary);
+  font-family: Georgia, serif;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+/* Author info */
+.rec-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.rec-author:hover {
+  opacity: 0.8;
+}
+
+.rec-author-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 119, 181, 0.25);
+}
+
+.rec-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rec-author-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-author-name .linkedin-badge {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+}
+
+.rec-author-name .linkedin-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rec-author-title {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  line-height: 1.3;
+}
+
+.rec-author-relation {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Carousel dots */
+.rec-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 0 18px;
+}
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tertiary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.rec-dot:hover {
+  background: var(--secondary);
+  transform: scale(1.2);
+}
+
+.rec-dot.active {
+  background: var(--primary);
+  width: 22px;
+  border-radius: 4px;
+}
+
+/* Navigation arrows */
+.rec-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 1rem;
+  z-index: 2;
+  transition: all 0.2s ease;
+  opacity: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.rec-carousel:hover .rec-nav {
+  opacity: 1;
+}
+
+.rec-nav:hover {
+  background: var(--primary);
+  color: var(--theme);
+  border-color: var(--primary);
+}
+
+.rec-nav-prev {
+  left: 8px;
+}
+
+.rec-nav-next {
+  right: 8px;
+}
+
+/* Progress bar for auto-rotation */
+.rec-progress {
+  height: 2px;
+  background: var(--tertiary);
+  overflow: hidden;
+}
+
+.rec-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0077b5, #00a0dc);
+  width: 0%;
+  transition: width linear;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rec-slide {
+    padding: 22px 20px;
+  }
+
+  .rec-quote {
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .rec-nav {
+    display: none;
+  }
+
+  .rec-carousel {
+    min-height: 200px;
+  }
+}

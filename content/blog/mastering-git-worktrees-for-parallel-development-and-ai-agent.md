@@ -172,6 +172,44 @@ You want one agent to explore a refactor, another to fix a bug, and another to t
 
 Now each task is isolated from the others. You can inspect diffs independently, run tests independently, and discard failures without contaminating your main workspace.
 
+### Multiple VS Code agent windows, one repository
+
+This is one of the nicest practical setups if you use VS Code with AI assistants or coding agents.
+
+Create one worktree per task, then open each worktree in a separate VS Code window:
+
+```bash
+git worktree add ../repo-agent-auth -b agent/auth-flow
+git worktree add ../repo-agent-bugfix -b agent/fix-session-race
+git worktree add ../repo-agent-cleanup -b agent/cleanup-types
+```
+
+Then open them independently:
+
+```bash
+code ../repo-agent-auth
+code ../repo-agent-bugfix
+code ../repo-agent-cleanup
+```
+
+Now each VS Code window has:
+
+- its own branch
+- its own terminal state
+- its own agent chat/context
+- its own local changes
+
+That matters a lot. If you run multiple agents inside one editor window or one shared repository checkout, context bleeds very quickly. One agent starts reading files another agent just changed. Terminal state becomes ambiguous. Diff review gets messy. You lose the clean mapping between task and workspace.
+
+With worktrees, the mapping becomes obvious:
+
+- VS Code window 1 → auth flow agent
+- VS Code window 2 → bugfix agent
+- VS Code window 3 → cleanup/refactor agent
+- main window → your own stable branch
+
+This is the simplest reliable way I know to run multiple VS Code agent sessions against the same codebase without turning the repo into a shared scratchpad.
+
 ### Human stays stable, agents branch off
 
 A good default model is:
@@ -232,6 +270,92 @@ When you see the directory name, you should know:
 - whether it is long-lived or disposable
 
 This matters more once parallel work becomes normal.
+
+## A Practical Multi-Agent VS Code Routine
+
+A simple routine works well:
+
+1. keep your main repo on `main` or your primary feature branch
+2. create one worktree per agent task
+3. open each worktree in its own VS Code window
+4. give each window one narrow objective
+5. review diffs separately
+6. merge or discard each branch independently
+
+For example:
+
+- `repo/` → your main development window
+- `repo-agent-auth/` → VS Code window for auth implementation agent
+- `repo-agent-tests/` → VS Code window for test-fixing agent
+- `repo-agent-docs/` → VS Code window for docs or cleanup agent
+
+This keeps concurrency real, but still reviewable. That is the balance you want.
+
+## My Exact Setup
+
+A setup like this is simple and works well in practice:
+
+- `repo/` → my main branch, where I keep my own stable working context
+- `repo-agent-feature/` → one VS Code window for a feature-building agent
+- `repo-agent-bugfix/` → one VS Code window for a bug-fixing agent
+- `repo-agent-cleanup/` → one VS Code window for cleanup or refactor work
+
+In practice, that means I can have multiple editor windows open against the same repository history, while keeping each task isolated at the filesystem and branch level.
+
+If you use tools like VS Code, Cursor, Claude Code, or similar agent-driven coding workflows, the pattern is the same:
+
+- one worktree per task
+- one branch per task
+- one editor window per task
+- one review decision per task
+
+That last point matters. The goal is not just parallelism. The goal is keeping parallelism reviewable.
+
+A good agent workflow should make it easier to inspect, test, merge, or throw away work. Worktrees do exactly that.
+
+## Automating the Setup
+
+If you end up using worktrees often, it is worth wrapping the setup in a small helper script.
+
+The manual commands are not hard, but they are repetitive. You create a branch, create a worktree, pick a directory name, and then open that directory in a new editor window. That is fine occasionally. It gets tedious once this becomes part of your normal development rhythm.
+
+A small wrapper gives you a much cleaner workflow.
+
+Instead of doing this every time:
+
+```bash
+git worktree add ../repo-agent-auth -b agent/auth-flow
+code ../repo-agent-auth
+```
+
+You can reduce it to something like:
+
+```bash
+wt agent-auth agent/auth-flow
+```
+
+That kind of command can do a few useful things automatically:
+
+- create the worktree in a consistent location
+- create or attach the branch
+- open the worktree in a new VS Code window
+- keep naming conventions consistent
+- make cleanup easier later
+
+This matters more than it sounds. Good tooling is often just removing small bits of repeated friction from workflows you do every day.
+
+In practice, a helper script can enforce a convention like this:
+
+- `repo/` → your main working tree
+- `repo-agent-auth/` → auth-flow task
+- `repo-agent-bugfix/` → session-race fix
+- `repo-agent-cleanup/` → cleanup or refactor task
+
+Once the command is cheap enough, parallel work becomes easier to reach for. That is important. The right workflow is not just the one that is technically possible. It is the one that is easy enough to use consistently.
+
+This is especially true for AI agent workflows. If your setup friction is high, you will be tempted to reuse the same workspace for unrelated tasks. That is exactly what you want to avoid. A tiny wrapper script makes the isolated path the convenient path.
+
+You do not need a big tool for this. A simple shell script is enough.
 
 ## Common Pitfalls
 
