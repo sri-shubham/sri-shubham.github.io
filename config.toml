@@ -111,6 +111,12 @@ name = "about"
 url = "/about/"
 weight = 30
 
+[[menu.main]]
+identifier = "Hire Me"
+name = "hire me"
+url = "/hire-me/"
+weight = 40
+
 
 
 [markup.goldmark.renderer]
