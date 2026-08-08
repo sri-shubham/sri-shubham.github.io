@@ -1,6 +1,6 @@
 ---
 title: "Context Is the New Security Vulnerability"
-date: 2026-08-08T15:00:00+05:30
+date: 2026-08-08T08:00:00+05:30
 draft: false
 description: "AI agents increasingly mix trusted instructions, untrusted data, memory and privileged tools inside the same context. That makes context a new security boundary."
 tags:
