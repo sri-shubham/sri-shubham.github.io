@@ -30,3 +30,54 @@
     <script src="{{ $progress.RelPermalink }}" defer></script>
 
 {{- end -}}
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    
+    function renderMermaid() {
+        const isDark = document.body.className.includes('dark');
+        mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default' });
+        
+        const blocks = document.querySelectorAll('.mermaid-block');
+        blocks.forEach(async function(block, index) {
+            const id = 'mermaid-' + index;
+            const text = block.getAttribute('data-mermaid');
+            try {
+                const { svg } = await mermaid.render(id, text);
+                block.innerHTML = svg;
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const blocks = document.querySelectorAll('code.language-mermaid');
+        blocks.forEach(function(block) {
+            const div = document.createElement('div');
+            div.className = 'mermaid-block';
+            div.style.textAlign = 'center';
+            div.style.margin = '20px 0';
+            div.setAttribute('data-mermaid', block.textContent);
+            
+            const pre = block.parentNode;
+            if (pre && pre.tagName === 'PRE') {
+                pre.replaceWith(div);
+            } else {
+                block.replaceWith(div);
+            }
+        });
+        
+        renderMermaid();
+
+        // Watch for theme changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === "class") {
+                    renderMermaid();
+                }
+            });
+        });
+        observer.observe(document.body, { attributes: true });
+    });
+</script>
