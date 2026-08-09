@@ -93,6 +93,14 @@ ignoreErrors = ["error-disable-taxonomy"]
   name = "LinkedIn"
   url = "https://www.linkedin.com/in/sri-shubham"
 
+[[params.socialIcons]]
+  name = "X"
+  url = "https://x.com/ShubhamSri13902"
+
+[[params.socialIcons]]
+  name = "RSS"
+  url = "/index.xml"
+
 [[menu.main]]
 identifier = "Blog"
 name = "blog"
